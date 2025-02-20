@@ -7,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
 public class JavaFXView implements IView {
     private static Stage stage;
     private static final CountDownLatch stageLatch = new CountDownLatch(1);
+    private final CountDownLatch welcomeLatch = new CountDownLatch(1);
     private JavaFXController controller;
 
     public JavaFXView() {
@@ -25,10 +25,11 @@ public class JavaFXView implements IView {
         }
         Platform.runLater(() -> {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("view.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/l7gui/pirates/view/view.fxml"));
                 Parent root = fxmlLoader.load();
                 controller = fxmlLoader.getController();
-                Scene scene = new Scene(root, 320, 240);
+                controller.setParentView(this);
+                Scene scene = new Scene(root, 600, 400);
                 stage.setTitle("Jeu des Pirates");
                 stage.setScene(scene);
                 stage.show();
@@ -51,9 +52,14 @@ public class JavaFXView implements IView {
     public void displayWelcome() {
         Platform.runLater(() -> {
             if (controller != null) {
-                controller.setWelcomeText("🦜 Bienvenue dans le jeu des Pirates 🏴‍☠️");
+                controller.setWelcome();
             }
         });
+        try {
+            welcomeLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -74,6 +80,10 @@ public class JavaFXView implements IView {
             e.printStackTrace();
         }
         return name[0].trim();
+    }
+
+    public void welcomeButtonPressed() {
+        welcomeLatch.countDown();
     }
 
     public static class JavaFXStarter extends Application {

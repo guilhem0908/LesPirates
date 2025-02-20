@@ -9,10 +9,10 @@ import org.l7gui.pirates.controller.GameController;
 public class Main {
     public static void main(String[] args) {
         // Mode GUI
-        // JavaFXView.launchJavaFX();
-        // IView view = new JavaFXView();
+        JavaFXView.launchJavaFX();
+        IView view = new JavaFXView();
         // Mode Console
-        IView view = new ConsoleView();
+        // IView view = new ConsoleView();
         GameModel model = new GameModel();
         GameController controller = new GameController(view, model);
         controller.start();
